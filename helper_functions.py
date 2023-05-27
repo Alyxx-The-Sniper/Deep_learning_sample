@@ -6,20 +6,15 @@ If a function gets defined once and could be used over and over, it'll go in her
 import torch
 import matplotlib.pyplot as plt
 import numpy as np
-
 from torch import nn
-
 import os
 import zipfile
-
 from pathlib import Path
-
 import requests
 
 # Walk through an image classification directory and find out how many files (images)
 # are in each subdirectory.
-import os
-
+#################################################################################################
 def walk_through_dir(dir_path):
     """
     Walks through dir_path returning its contents.
@@ -34,7 +29,7 @@ def walk_through_dir(dir_path):
     """
     for dirpath, dirnames, filenames in os.walk(dir_path):
         print(f"There are {len(dirnames)} directories and {len(filenames)} images in '{dirpath}'.")
-
+#################################################################################################
 def plot_decision_boundary(model: torch.nn.Module, X: torch.Tensor, y: torch.Tensor):
     """Plots decision boundaries of model predicting on X in comparison to y.
 
@@ -70,7 +65,7 @@ def plot_decision_boundary(model: torch.nn.Module, X: torch.Tensor, y: torch.Ten
     plt.xlim(xx.min(), xx.max())
     plt.ylim(yy.min(), yy.max())
 
-
+#################################################################################################
 # Plot linear data or training and test and predictions (optional)
 def plot_predictions(
     train_data, train_labels, test_data, test_labels, predictions=None
@@ -93,7 +88,7 @@ def plot_predictions(
     # Show the legend
     plt.legend(prop={"size": 14})
 
-
+#################################################################################################
 # Calculate accuracy (a classification metric)
 def accuracy_fn(y_true, y_pred):
     """Calculates accuracy between truth labels and predictions.
@@ -109,7 +104,7 @@ def accuracy_fn(y_true, y_pred):
     acc = (correct / len(y_pred)) * 100
     return acc
 
-
+#################################################################################################
 def print_train_time(start, end, device=None):
     """Prints difference between start and end time.
 
@@ -125,7 +120,7 @@ def print_train_time(start, end, device=None):
     print(f"\nTrain time on {device}: {total_time:.3f} seconds")
     return total_time
 
-
+#################################################################################################
 # Plot loss curves of a model
 def plot_loss_curves(results):
     """Plots training curves of a results dictionary.
@@ -169,7 +164,7 @@ def plot_loss_curves(results):
 from typing import List
 import torchvision
 
-
+#################################################################################################
 def pred_and_plot_image(
     model: torch.nn.Module,
     image_path: str,
@@ -235,7 +230,7 @@ def pred_and_plot_image(
         title = f"Pred: {target_image_pred_label} | Prob: {target_image_pred_probs.max().cpu():.3f}"
     plt.title(title)
     plt.axis(False)
-
+#################################################################################################
 def set_seeds(seed: int=42):
     """Sets random sets for torch operations.
 
@@ -246,8 +241,8 @@ def set_seeds(seed: int=42):
     torch.manual_seed(seed)
     # Set the seed for CUDA torch operations (ones that happen on the GPU)
     torch.cuda.manual_seed(seed)
-
-def download_data(source: str, 
+#################################################################################################
+def download_data_V1(source: str, 
                   destination: str,
                   remove_source: bool = True) -> Path:
     """Downloads a zipped dataset from source and unzips to destination.
@@ -292,3 +287,67 @@ def download_data(source: str,
             os.remove(data_path / target_file)
     
     return image_path
+#################################################################################################
+def download_data_V2(txtfile, source, destination, food_list=[], random_seed=42):
+    """Downloads a sample list from a text file.
+
+    Args:
+        txtfile: A link to a txtfile containing data sample name list.
+        source: The source destination of the images
+        food_list: List of food class to be downloaded.
+        random_seed: default is 42    
+    """                              
+    
+    class_types = defaultdict(list)
+    with open(txtfile, "r") as file:
+        lines = [line.strip() for line in file.readlines()]
+        for l in lines:
+            class_type = l.split("/")
+            if class_type[0] in food_list:
+                class_types[class_type[0]].append(class_type[1] + ".jpg")
+    
+    for i in class_types.keys():
+        print("  " + i, end="  ")
+        if not os.path.exists(os.path.join(destination, i)):
+            os.makedirs(os.path.join(destination, i))
+        
+        # Retrieve random sample of 10% of the data
+        data_sample = random.sample(class_types[i], k=int(len(class_types[i]) * 0.1))
+        
+        for n in data_sample:
+            copy(os.path.join(source, i, n), os.path.join(destination, i, n))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
